@@ -8,7 +8,7 @@ module TicTacToe
       puts("#{current_player}'s turn. Enter your move (row,column):")
       input = gets
       return 'exit' if input.nil?
-      
+
       input.chomp
     end
 
