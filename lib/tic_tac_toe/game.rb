@@ -28,7 +28,7 @@ module TicTacToe
       return :exit if input.downcase == 'exit'
 
       if process_move(input)
-        return :game_over if check_game_end
+        return :exit if check_game_end
 
         switch_player
       end
