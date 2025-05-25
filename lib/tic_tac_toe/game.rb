@@ -1,57 +1,80 @@
 require_relative 'board'
+require_relative 'user_interface'
+require_relative 'player'
+require_relative 'input_validator'
 
-class Game
-  def initialize
-    @board = Board.new
-    @current_player = 'X'
-  end
+module TicTacToe
+  class Game
+    def initialize
+      @board = Board.new
+      @player_x = Player.new('X', 'Player X')
+      @player_o = Player.new('O', 'Player O')
+      @current_player = @player_x
+    end
 
-  def start
-    puts('Welcome to Tic Tac Toe!')
-    @board.display
+    def start
+      UserInterface.welcome_message
+      @board.display
 
-    loop do
-      puts("#{@current_player}'s turn. Enter your move (row,column):")
-      input = gets.chomp
-
-      break if input.downcase == 'exit'
-
-      begin
-        row, col = input.split(',').map(&:to_i)
-        @move = [row, col]
-
-        if make_move
-          if winner?
-            puts("#{@current_player} wins!")
-            break
-          elsif @board.full?
-            puts("It's a draw!")
-            break
-          end
-
-          switch_player
-        end
-      rescue StandardError
-        puts('Invalid input. Please enter row and column as numbers separated by a comma (e.g., 1,2).')
+      loop do
+        break if handle_turn == :exit
       end
     end
-  end
 
-  def make_move
-    if @board.update_board(@current_player, @move)
-      @board.display
-      true
-    else
-      puts('Invalid move. Try again.')
+    private
+
+    def handle_turn
+      input = player_input
+      return :exit if input.downcase == 'exit'
+
+      if process_move(input)
+        return :game_over if check_game_end
+
+        switch_player
+      end
+      :continue
+    end
+
+    def player_input
+      UserInterface.get_player_move(@current_player.symbol)
+    end
+
+    def process_move(input)
+      @move = InputValidator.parse_coordinates(input)
+      make_move
+    rescue ArgumentError
+      UserInterface.invalid_input_message
       false
     end
-  end
 
-  def switch_player
-    @current_player = @current_player == 'X' ? 'O' : 'X'
-  end
+    def check_game_end
+      if winner?
+        UserInterface.winner_message(@current_player.name)
+        true
+      elsif @board.full?
+        UserInterface.draw_message
+        true
+      else
+        false
+      end
+    end
 
-  def winner?
-    @board.winning_state
+    def make_move
+      if @board.update_board(@current_player.symbol, @move)
+        @board.display
+        true
+      else
+        UserInterface.invalid_move_message
+        false
+      end
+    end
+
+    def switch_player
+      @current_player = @current_player == @player_x ? @player_o : @player_x
+    end
+
+    def winner?
+      @board.winner?
+    end
   end
 end
