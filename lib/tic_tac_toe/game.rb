@@ -32,6 +32,7 @@ module TicTacToe
 
         switch_player
       end
+
       :continue
     end
 

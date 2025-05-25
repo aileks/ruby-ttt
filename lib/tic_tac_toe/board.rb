@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TicTacToe
   class Board
     BOARD_SIZE = 3
@@ -68,11 +70,11 @@ module TicTacToe
     end
 
     def full?
-      @board.flatten.none? { |cell| cell == EMPTY_CELL }
+      @board.flatten.none?(EMPTY_CELL)
     end
 
     def empty?
-      @board.flatten.all? { |cell| cell == EMPTY_CELL }
+      @board.flatten.all?(EMPTY_CELL)
     end
 
     def move_count
